@@ -17,4 +17,4 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y zsh
 
     - name: Run Zsh tests
-      run: zsh ./test_lambda.zsh
+      run: zsh ./test_runner.zsh

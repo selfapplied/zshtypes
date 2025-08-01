@@ -1,0 +1,13 @@
+#!/usr/bin/env zsh
+#
+# Integration test simulating a deployment workflow.
+#
+
+def_lp test_config_exists '[[ -f README.md ]]' 'deploy:config-exists'
+def_lp test_source_available '[[ -d src ]]' 'deploy:source-available'
+def_lp test_tests_runnable '[[ -f test_runner.zsh ]]' 'deploy:tests-runnable'
+
+def_la test_deploy_simulation 'echo "Deploying..." >/dev/null' 'deploy:simulated'
+
+# Generate the proof for this test file
+proof=$(r test_config_exists test_source_available test_tests_runnable -- test_deploy_simulation) 

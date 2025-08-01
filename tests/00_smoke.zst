@@ -1,0 +1,10 @@
+#!/usr/bin/env zsh
+#
+# Smoke test for zshtypes core functionality.
+#
+
+def_lp test_basic_predicate 'true' 'smoke:basic-predicate'
+def_la test_basic_action 'echo "hello" >/dev/null' 'smoke:basic-action'
+
+# Generate the proof for this test file
+proof=$(r test_basic_predicate -- test_basic_action) 
