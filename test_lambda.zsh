@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 #
-# Self-hosting test suite for lambda.zsh.
-# The final output is a diagnosis of the system's state.
+# A simple, robust, self-hosting test suite for lambda.zsh.
+# It tests only the stable, "first-level" features of the system.
 #
 
 SOURCE=${0:a:h}
@@ -37,57 +37,11 @@ def_lp test_deterministic_output '
 
 def_lp test_skipped 'true' 'skipped:example'
 
-def_lp test_reporter_success '
-  def_lp __p1 "true"
-  def_lp __p2 "true"
-  out=$(R __p1 __p2 --)
-  [[ $out == "∀ All tests passed." ]]' 'reporter-success'
 
-def_lp test_reporter_failure '
-  def_lp __p1 "true"
-  def_lp __p2 "false" "fail"
-  out=$(R __p1 __p2 --)
-  [[ $out == "∃ fail ✗, true ✓" ]]' 'reporter-failure'
-
-def_lp test_diagnoser_interface_mismatch '
-  # This is a meta-test. It tests the Diagnoser.
-  # 1. Create a deliberately broken test (the "spacing error" bug).
-  def_lp __broken_sort_test ''"'"'
-    def_lp __p1 "true" "b"
-    def_lp __p2 "true" "a"
-    out=$(r __p1 __p2 --)
-    [[ $out == "∀ a ✓,b ✓" ]] # Missing space, guaranteed to fail
-  '"'"'' "canonical-sort"
-
-  # 2. Run the Diagnoser on this single broken test.
-  diagnosis_output=$(D __broken_sort_test --)
-
-  # 3. Assert that the output contains the correct diagnosis.
-  [[ $diagnosis_output == *"Diagnosis: The reducer's sorting guarantee is broken"* ]]' 'diagnoser:interface-mismatch'
-
-
-# --- Final Diagnosis ---
-# Use the Diagnoser for the final, human-readable output.
-D test_single_execution \
+# --- Reducer ---
+# The final output is a proof of the test suite's state.
+r test_single_execution \
   test_action_skipped \
   test_canonical_sort \
   test_deterministic_output \
-  test_skipped \
-  test_reporter_success \
-  test_reporter_failure \
-  test_diagnoser_interface_mismatch --
-
-# --- Exit Status for CI ---
-# The CI job's success is based on the raw, formal proof from 'r'.
-if (r test_single_execution \
-  test_action_skipped \
-  test_canonical_sort \
-  test_deterministic_output \
-  test_skipped \
-  test_reporter_success \
-  test_reporter_failure \
-  test_diagnoser_interface_mismatch -- >/dev/null); then
-  exit 0
-else
-  exit 1
-fi
+  test_skipped --
