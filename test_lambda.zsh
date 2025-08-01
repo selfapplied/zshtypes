@@ -49,6 +49,22 @@ def_lp test_reporter_failure '
   out=$(R __p1 __p2 --)
   [[ $out == "∃ fail ✗, true ✓" ]]' 'reporter-failure'
 
+def_lp test_diagnoser_interface_mismatch '
+  # This is a meta-test. It tests the Diagnoser.
+  # 1. Create a deliberately broken test (the "spacing error" bug).
+  def_lp __broken_sort_test ''"'"'
+    def_lp __p1 "true" "b"
+    def_lp __p2 "true" "a"
+    out=$(r __p1 __p2 --)
+    [[ $out == "∀ a ✓,b ✓" ]] # Missing space, guaranteed to fail
+  '"'"'' "canonical-sort"
+
+  # 2. Run the Diagnoser on this single broken test.
+  diagnosis_output=$(D __broken_sort_test --)
+
+  # 3. Assert that the output contains the correct diagnosis.
+  [[ $diagnosis_output == *"Diagnosis: The reducer's sorting guarantee is broken"* ]]' 'diagnoser:interface-mismatch'
+
 
 # --- Final Diagnosis ---
 # Use the Diagnoser for the final, human-readable output.
@@ -58,7 +74,8 @@ D test_single_execution \
   test_deterministic_output \
   test_skipped \
   test_reporter_success \
-  test_reporter_failure --
+  test_reporter_failure \
+  test_diagnoser_interface_mismatch --
 
 # --- Exit Status for CI ---
 # The CI job's success is based on the raw, formal proof from 'r'.
@@ -68,7 +85,8 @@ if (r test_single_execution \
   test_deterministic_output \
   test_skipped \
   test_reporter_success \
-  test_reporter_failure -- >/dev/null); then
+  test_reporter_failure \
+  test_diagnoser_interface_mismatch -- >/dev/null); then
   exit 0
 else
   exit 1
