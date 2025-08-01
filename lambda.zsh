@@ -19,8 +19,10 @@ def_la() {
   eval "$name() { $cmd && REPLY='$label ✓' || REPLY='$label ✗'; return \$?; }"
 }
 
-# --- Reducer ---
+# --- Reducer & Reporter ---
 
+# r: The core reducer.
+# Prints the full, verbose proof sentence and returns 0 on ∀, 1 otherwise.
 r() {
   local ok=1 labels=() token
   while [[ $1 && $1 != -- ]]; do
@@ -41,6 +43,19 @@ r() {
   local q
   (( ${#labels} == 0 )) && q='¬∃' || { (( ok )) && q='∀' || q='∃'; }
   print -r -- "$q ${(j:, :)labels}"
+  (( ok && ${#labels} > 0 )) && return 0 || return 1
+}
+
+# R: A human-friendly reporter.
+# Prints a clean summary on success, or the full proof on failure.
+R() {
+  local output
+  output=$(r "$@")
+  if [[ $? -eq 0 ]]; then
+    print -r -- "∀ All tests passed."
+  else
+    print -r -- "$output"
+  fi
 }
 
 typeset -gi __count=0

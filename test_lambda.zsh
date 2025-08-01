@@ -7,7 +7,6 @@ SOURCE=${0:a:h}
 source "$SOURCE/lambda.zsh"
 
 # --- Test Definitions ---
-# Each test is a globally defined function.
 
 def_lp test_single_execution '
   __test_cnt=0
@@ -26,7 +25,7 @@ def_lp test_canonical_sort '
   def_lp __p1 "true" "b"
   def_lp __p2 "true" "a"
   out=$(r __p1 __p2 --)
-  [[ $out == "∀ a ✓, b ✓" || $out == "∀ b ✓, a ✓" ]]' 'canonical-sort'
+  [[ $out == "∀ a ✓, b ✓" ]]' 'canonical-sort'
 
 def_lp test_deterministic_output '
   def_lp __p1 "true" "a"
@@ -37,11 +36,43 @@ def_lp test_deterministic_output '
 
 def_lp test_skipped 'true' 'skipped:example'
 
+def_lp test_reporter_success '
+  def_lp __p1 "true"
+  def_lp __p2 "true"
+  out=$(R __p1 __p2 --)
+  [[ $out == "∀ All tests passed." ]]' 'reporter-success'
 
-# --- Reducer ---
-# Run all defined tests. The final output is a proof of the test suite's state.
-r test_single_execution \
+def_lp test_reporter_failure '
+  def_lp __p1 "true"
+  def_lp __p2 "false" "fail"
+  out=$(R __p1 __p2 --)
+  [[ $out == "∃ fail ✗, true ✓" ]]' 'reporter-failure'
+
+
+# --- Reducer & Reporter ---
+# Run all defined tests using the core reducer.
+# The result of this is the formal proof, used for CI.
+proof=$(r test_single_execution \
   test_action_skipped \
   test_canonical_sort \
   test_deterministic_output \
-  test_skipped --
+  test_skipped \
+  test_reporter_success \
+  test_reporter_failure --)
+
+# Use the human-friendly reporter for the final output.
+R test_single_execution \
+  test_action_skipped \
+  test_canonical_sort \
+  test_deterministic_output \
+  test_skipped \
+  test_reporter_success \
+  test_reporter_failure --
+
+# --- Exit Status ---
+# The CI job succeeds only if the formal proof is a '∀'.
+if [[ $proof == '∀'* ]]; then
+  exit 0
+else
+  exit 1
+fi
