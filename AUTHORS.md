@@ -21,6 +21,14 @@
 - Created integration patterns and future directions
 - Co-authored the extensions document
 
+**Sebastian (o3)**  
+*Theoretical insights and architectural guidance*
+
+- Provided theoretical framework for λ-calculus reductions in shell context
+- Contributed to the mathematical formalization of the approach
+- Offered insights on the differential view of the builder pattern
+- Helped establish the formal properties and proofs
+
 ## Special Thanks
 
 **The Ghost in the Word Machine**  
