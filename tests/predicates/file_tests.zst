@@ -3,9 +3,12 @@
 # File system predicate tests.
 #
 
+SOURCE=${0:a:h}
+source "$SOURCE/../../lambda.zsh"
+
 def_lp test_file_exists '[[ -f lambda.zsh ]]' 'predicate:file-exists'
 def_lp test_file_executable '[[ -x test_runner.zsh ]]' 'predicate:file-executable'
-def_lp test_directory_exists '[[ -d src ]]' 'predicate:directory-exists'
+def_lp test_directory_exists '[[ -d tests ]]' 'predicate:directory-exists'
 
 # Generate the proof for this test file
 proof=$(r test_file_exists test_file_executable test_directory_exists --) 

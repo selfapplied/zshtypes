@@ -5,7 +5,7 @@
 #
 
 SOURCE=${0:a:h}
-source "$SOURCE/src/lambda_core.zsh"
+source "$SOURCE/lambda.zsh"
 
 all_ok=1 proof_lines=() test_count=0
 

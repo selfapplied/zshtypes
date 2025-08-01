@@ -3,6 +3,9 @@
 # Smoke test for zshtypes core functionality.
 #
 
+SOURCE=${0:a:h}
+source "$SOURCE/../lambda.zsh"
+
 def_lp test_basic_predicate 'true' 'smoke:basic-predicate'
 def_la test_basic_action 'echo "hello" >/dev/null' 'smoke:basic-action'
 

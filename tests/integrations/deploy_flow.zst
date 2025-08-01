@@ -3,8 +3,11 @@
 # Integration test simulating a deployment workflow.
 #
 
+SOURCE=${0:a:h}
+source "$SOURCE/../../lambda.zsh"
+
 def_lp test_config_exists '[[ -f README.md ]]' 'deploy:config-exists'
-def_lp test_source_available '[[ -d src ]]' 'deploy:source-available'
+def_lp test_source_available '[[ -f lambda.zsh ]]' 'deploy:source-available'
 def_lp test_tests_runnable '[[ -f test_runner.zsh ]]' 'deploy:tests-runnable'
 
 def_la test_deploy_simulation 'echo "Deploying..." >/dev/null' 'deploy:simulated'
