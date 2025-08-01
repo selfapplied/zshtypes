@@ -2,7 +2,7 @@
 
 ## Core Contributors
 
-**Sebastian "honedbeat"**  
+**honedbeat**  
 *Original concept, implementation, and theoretical foundation*
 
 - Conceived the idea of attaching formal reasoning to shell scripts using λ-calculus
