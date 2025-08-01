@@ -1,6 +1,7 @@
 #!/usr/bin/env zsh
 #
-# Self-hosting test suite for lambda.zsh
+# Self-hosting test suite for lambda.zsh.
+# The final output is a diagnosis of the system's state.
 #
 
 SOURCE=${0:a:h}
@@ -49,19 +50,9 @@ def_lp test_reporter_failure '
   [[ $out == "∃ fail ✗, true ✓" ]]' 'reporter-failure'
 
 
-# --- Reducer & Reporter ---
-# Run all defined tests using the core reducer.
-# The result of this is the formal proof, used for CI.
-proof=$(r test_single_execution \
-  test_action_skipped \
-  test_canonical_sort \
-  test_deterministic_output \
-  test_skipped \
-  test_reporter_success \
-  test_reporter_failure --)
-
-# Use the human-friendly reporter for the final output.
-R test_single_execution \
+# --- Final Diagnosis ---
+# Use the Diagnoser for the final, human-readable output.
+D test_single_execution \
   test_action_skipped \
   test_canonical_sort \
   test_deterministic_output \
@@ -69,9 +60,15 @@ R test_single_execution \
   test_reporter_success \
   test_reporter_failure --
 
-# --- Exit Status ---
-# The CI job succeeds only if the formal proof is a '∀'.
-if [[ $proof == '∀'* ]]; then
+# --- Exit Status for CI ---
+# The CI job's success is based on the raw, formal proof from 'r'.
+if (r test_single_execution \
+  test_action_skipped \
+  test_canonical_sort \
+  test_deterministic_output \
+  test_skipped \
+  test_reporter_success \
+  test_reporter_failure -- >/dev/null); then
   exit 0
 else
   exit 1
