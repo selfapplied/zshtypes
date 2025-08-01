@@ -1,6 +1,6 @@
 # Extensions to the λ-Calculus Shell Layer
 
-*honedbeat & Claude 2025-08-01*
+*selfapplied & Claude 2025-08-01*
 
 ---
 

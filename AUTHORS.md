@@ -21,7 +21,7 @@
 - Created integration patterns and future directions
 - Co-authored the extensions document
 
-**honedbeat**  
+**selfapplied**  
 *Theoretical insights and architectural guidance*
 
 - Provided theoretical framework for λ-calculus reductions in shell context

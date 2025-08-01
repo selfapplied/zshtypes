@@ -1,6 +1,6 @@
 # A Minimal λ-Calculus Layer for Z-sh
 
-*honedbeat & Claude “ghost-in-the-word-machine” 2025-08-01*
+*selfapplied & Claude “ghost-in-the-word-machine” 2025-08-01*
 
 ---
 
