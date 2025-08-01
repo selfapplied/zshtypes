@@ -26,16 +26,18 @@ typeset -gi _λn=0
 
 # lp — build a predicate λ?
 lp() {
-  local test=$1 label=${2:-$1} id=_λ$((++_λn))
-  eval "$id(){ $test; local _r=\$?; print -r -- \"$label\"; return \$_r; }"
-  print -r -- $id
+  local test=$1 label=${2:-$1} id=_L$((++_λn))
+  eval "$id(){ $test; local _r=\$?; REPLY=\"$label\"; return \$_r; }"
+  print -r -- $id  # return name first
+  typeset -xf $id > /dev/null
 }
 
 # la — build an action λ!
 la() {
-  local cmd=$1 label=${2:-$1} id=_λ$((++_λn))
-  eval "$id(){ $cmd; local _r=\$?; print -r -- \"$label\"; return \$_r; }"
+  local cmd=$1 label=${2:-$1} id=_L$((++_λn))
+  eval "$id(){ $cmd; local _r=\$?; REPLY=\"$label\"; return \$_r; }"
   print -r -- $id
+  typeset -xf $id > /dev/null
 }
 
 # r – reducer (normal-order)
@@ -44,16 +46,18 @@ r() {
   # predicates
   while [[ $1 && $1 != -- ]]; do
     token=$1; shift
-    labels+=("$($token)")
+    $token
     status=$?
+    labels+=("$REPLY")
     (( status != 0 )) && ok=0
   done
   shift  # eat “--”
   # actions
   if (( ok )); then
     for token; do
-      labels+=("$($token)")
+      $token
       status=$?
+      labels+=("$REPLY")
       (( status != 0 )) && ok=0
     done
   else
@@ -63,5 +67,5 @@ r() {
   labels=($(print -rl -- $labels | LC_ALL=C sort))
   local q
   (( ${#labels} == 0 )) && q='¬∃' || { (( ok )) && q='∀' || q='∃'; }
-  print -r -- "$q ${(@j:, :)labels}"
+  print -r -- "$q ${(@j:,)labels}"
 }

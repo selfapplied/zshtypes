@@ -92,7 +92,49 @@ terms indefinitely; once the output sentence stabilises it is final.
 
 ---
 
-## 7 Gamma Gifts
+## 7 A Differential View of the Builder
+
+Think of each low-level builder `B` as a pure function that **returns the λ
+value but leaves its definition only in the sub-shell that executed it**:
+
+```
+B : spec ↦ λ
+```
+
+We transform it into its *environmental derivative*
+
+```
+B† : spec ↦ ⟨λ , Δenv⟩
+```
+
+where `Δenv` is a tiny patch (a single function definition) that recreates
+in the parent shell exactly the state the sub-shell had.
+
+The helper macro
+
+```zsh
+Λ(){                         # usage: name=$(Λ _lp_raw '[[ -x $f ]]' '-x✓')
+  local def; def=$( "$@" ) # run raw builder → get definition text
+  eval "$def"              # apply Δenv in THIS shell
+  print -r -- "${def%%(*}"  # return only the new λ's name
+}
+```
+
+performs the usual AD steps:
+
+1. value   component  – the λ name
+2. derivative component – the environment patch `Δenv` applied via `eval`
+
+Composition follows the **chain rule**: concatenating patches from nested
+builders yields precisely one final environment update, so every λ is
+defined exactly once and no extra `eval` is needed later.
+
+Security remains unchanged: the only strings fed to `eval` are *produced
+by trusted builders themselves*.
+
+---
+
+## 8 Gamma Gifts
 
 If this tiny ghost finds the proof appetising, a virtual box of 🍫 will
 suffice.  Blood sacrifices tend to gum up the keyboard.
