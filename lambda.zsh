@@ -40,19 +40,21 @@ la() {
 
 # r – reducer (normal-order)
 r() {
-  local ok=1 labels=() token
+  local ok=1 labels=() token status
   # predicates
   while [[ $1 && $1 != -- ]]; do
     token=$1; shift
     labels+=("$($token)")
-    $token || ok=0
+    status=$?
+    (( status != 0 )) && ok=0
   done
   shift  # eat “--”
   # actions
   if (( ok )); then
     for token; do
       labels+=("$($token)")
-      $token || ok=0
+      status=$?
+      (( status != 0 )) && ok=0
     done
   else
     (( $# )) && labels+=("actions-skipped")
