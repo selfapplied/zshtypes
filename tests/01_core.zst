@@ -1,0 +1,50 @@
+#!/usr/bin/env zsh
+#
+# A self-hosting test suite for lambda.zsh.
+# The final output is a diagnosis of the system's state.
+#
+
+SOURCE=${0:a:h}
+source "$SOURCE/../lambda.zsh"
+
+# --- Small Composable Functions ---
+
+def_la reset_cnt 'cnt=0'
+def_la inc_cnt '((cnt++))'
+def_la cnt_is_1 '((cnt == 1))'
+def_la cnt_is_0 '((cnt == 0))'
+def_lp always_true 'true'
+def_lp always_false 'false'
+
+def_lp p1_true_b 'true' 'b'
+def_lp p2_true_a 'true' 'a'
+def_lp p1_true_a 'true' 'a'
+def_lp p2_true_b 'true' 'b'
+
+def_la out_eq_ab '[[ $out == "∀ a ✓, b ✓" ]]'
+def_la out_eq '[[ $out1 == $out2 ]]'
+
+# --- Test Definitions ---
+
+def_lp test_single_execution 'r reset_cnt -- inc_cnt; cnt_is_1' stable:single-execution
+
+def_lp test_action_skipped 'r reset_cnt -- always_false; r always_false -- inc_cnt; cnt_is_0' stable:action-skipped
+
+def_lp test_canonical_sort 'out=$(r p1_true_b p2_true_a --); out_eq_ab' stable:canonical-sort
+
+def_lp test_deterministic_output 'out1=$(r p1_true_a p2_true_b --); out2=$(r p2_true_b p1_true_a --); out_eq' stable:deterministic-output
+
+# We acknowledge the higher-level abstractions are less stable,
+# so we register them as "skipped" for now. This makes the test
+# suite an honest reflection of the project's state.
+def_lp test_reporter 'true' 'skipped:reporter-tests'
+def_lp test_diagnoser 'true' 'skipped:diagnoser-tests'
+
+# --- Generate Proof ---
+# Each test file must set $proof for the test runner
+proof=$(r test_single_execution \
+  test_action_skipped \
+  test_canonical_sort \
+  test_deterministic_output \
+  test_reporter \
+  test_diagnoser --)
